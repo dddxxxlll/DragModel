@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #app_content span{display:inline-block;width:130px;text-align:right;}
+        #app_content div a{display:inline-block;margin-left:10px;}
+        #app_content>div{height:55px;line-height:55px;}
+        .cover{width:10000px;height:10000px;background:rgba(200,200,200,0.3);position:absolute;z-index:1050;top:0px;left:0px;}
+        /*modal*/
+        .closeBtn3{
+            cursor:pointer;
+            width:30px;
+            height:30px;
+            border-radius:15px;
+            background:#fff;
+            color:#00a0e9;
+            border:1px solid #00a0e9;
+            position:absolute;
+            top:-10px;
+            line-height:30px;
+            right:-10px
+        }
+        .modalHeader{
+
+            background:rgb(40,134,250);
+
+            color:#fff;
+            position:relative;
+
+
+
+            text-align:center;
+            border-radius:8px 8px 0 0;
+            height:45px;
+            line-height:45px;
+            font-size:18px;
+        }
+        .modalFooter{
+            margin:0 auto
+        }
+        .modalFooter > div{
+            width:150px;
+            text-align:center;
+            border-radius:4px;
+            cursor:pointer;
+            margin-top:7px;
+            height:35px;
+            line-height:35px;
+            border:1px solid #399BFF;
+        }
+    </style>
+    <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.min.js"></script>
+</head>
+<body>
+<button onclick="add_app()">打开模态框</button>
+<!-- 弹出框 -->
+<div id="application" class="modal" style="display:none;position:fixed;top:0;left:0;height:100%;width:100%;background:rgba(0,0,0,0.3)">
+    <div class="cover"></div>
+    <div id="app_detail" style="width:700px;height:400px;position:absolute;left:50%;top:50%;transform: translate3d(-50%, -50%, 0px);background:#fff;border-radius: 8px;z-index:1060;">
+
+        <div  class="modalHeader" style="width:100%;text-align:center;">
+            <em class="" style="font-size:20px">添加应用</em>
+            <div class="closeBtn3" onclick="close_sp('#application','#app_detail')" style="text-align:center">X</div>
+        </div>
+        <div class="modalContent" id="app_content" style="height: 280px;">
+            <div><span>应用名：</span><input type="text"></div>
+            <div><span>应用描述：</span><textarea></textarea></div>
+            <div><span>选择服务：</span><a style="cursor:pointer;color: #428bca;text-decoration: none;" onclick="open_s('#servers_detail','#app_detail')" id="recipient_show">请选择</a></div>
+        </div>
+        <div class="modalFooter" style="border-top:1px solid #ccc; overflow: hidden;margin-top:21px;">
+            <div onclick="" style="float:right;margin-right:70px;background:#399BFF;color:#fff;">确认</div> <div onclick="close_sp('#application','#app_detail')" style="float:left;margin-left:70px;">取消</div>
+        </div>
+
+    </div>
+    <div id="servers_detail" style="display:none;width:700px;height:400px;position:absolute;left:50%;top:50%;transform: translate3d(-50%, -50%, 0px);background:#fff;border-radius: 8px;z-index:1060;">
+
+        <div  class="modalHeader" style="width:100%;text-align:center;">
+            <em class="" style="font-size:20px">添加应用</em>
+            <div class="closeBtn3" onclick="close_s('#servers_detail','#app_detail')" style="text-align:center">X</div>
+        </div>
+        <div class="modalContent" style="height: 304px;padding: 0 20px;width: 660px;">
+            <div class="table app">
+
+            </div>
+        </div>
+        <div class="modalFooter" style="border-top:1px solid #ccc; overflow: hidden;">
+            <div onclick="close_s('#servers_detail','#app_detail')" style="float:right;margin-right:70px;background:#399BFF;color:#fff;">确认</div> <div onclick="close_s('#servers_detail','#app_detail')" style="float:left;margin-left:70px;">取消</div>
+        </div>
+    </div>
+</div>
+<script>
+    function add_app(){
+        $('#application').css('display','block');
+        /* 增加拖动 */
+        $("#app_detail").addClass('adddrag');
+        $("#app_detail .modalHeader").addClass('dragarea');
+        drag();
+    }
+
+    //模态框方法
+    function open_s(id,idfrom){
+        $(id).css("display","block");
+        $(id).css("z-index","1060");
+        $(idfrom).css("z-index","1");
+        $(".cover").css("display","block");
+
+        $(idfrom).removeClass('adddrag');
+        $(idfrom+" .modalHeader").removeClass('dragarea');
+        $(id).addClass('adddrag');
+        $(id+" .modalHeader").addClass('dragarea');
+        drag();
+    }
+
+    function close_s(id,idto){
+        $(id).css("display","none");
+        $(id).css("z-index","1");
+        $(idto).css("z-index","1060");
+
+        $(id).removeClass('adddrag');
+        $(id+" .modalHeader").removeClass('dragarea');
+        $(idto).addClass('adddrag');
+        $(idto+" .modalHeader").addClass('dragarea');
+        drag();
+    }
+
+    function close_sp(id,id2){
+        $(id).css("display","none");
+        $(id2).removeClass('adddrag');
+        $(id2+" .modalHeader").removeClass('dragarea');
+    }
+
+    //拖动函数
+    function drag() {
+        var oDiv = document.getElementsByClassName('adddrag')[0];
+        var oDiv2 = document.getElementsByClassName('dragarea')[0];
+        // var b = $('.infoBox')[0];
+        oDiv2.onmousedown = function(ev){
+
+            var ev = ev || event;
+            var disX = ev.clientX - oDiv.offsetLeft;
+            var disY = ev.clientY - oDiv.offsetTop;
+            if(oDiv2.setCapture){
+                oDiv2.setCapture();
+            }
+            document.onmousemove = function(ev){
+                //这里为什么使用document，是因为快速拖拽的话会鼠标丢失，
+
+                var ev = ev || event;
+                oDiv.style.left = ev.clientX - disX+"px";
+                oDiv.style.top = ev.clientY - disY+"px";
+            }
+
+            document.onmouseup = function(ev){
+                document.onmousemove = document.onmouseup = null;
+                //为何不用oDiv.onmouseup是因为被挡住之后会无视掉遮挡的元素
+                if(oDiv2.releaseCapture){
+
+                    oDiv2.releaseCapture();
+                }
+            }
+            return false;
+        }
+    }
+</script>
+</body>
+</html>
